@@ -1,0 +1,7 @@
+---
+- name: installation message
+  debug:
+    msg: |
+      Matomo is now successfully installed.
+      Go ahead to http://{{ ansible_hostname }}/ to run the quick setup.
+      If you run this role again after that, some more configuration will be done.

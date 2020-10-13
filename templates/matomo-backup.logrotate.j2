@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+{{ matomo_backup_dir }}/log/matomo-backup.log {
+    daily
+    missingok
+    notifempty
+    compress
+    delaycompress
+}

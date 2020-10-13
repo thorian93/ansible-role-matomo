@@ -1,0 +1,43 @@
+---
+- name: "Install Prerequisites."
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ matomo_prerequisites }}"
+  notify: "restart webserver {{ webserver_name }}"
+
+- name: "Download Matomo Files."
+  get_url:
+    url: "{{ item.source }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { source: "{{ matomo_setup_file }}", dest: /tmp/matomo.zip }
+    - { source: "{{ matomo_gpg_key_file }}", dest: /tmp/matomo.zip.asc }
+    - { source: "{{ matomo_gpg_public_key }}", dest: /tmp/signature.asc }
+
+- name: "Import Matomo GPG Key."
+  command: "gpg --import /tmp/signature.asc"
+  register: gpg_key_status
+  changed_when: "'imported: 1' in gpg_key_status.stderr"
+  failed_when: gpg_key_status.rc > 0
+
+- name: "Verify Matomo Package."
+  command: "gpg --verify /tmp/matomo.zip.asc /tmp/matomo.zip"
+  register: gpg_package_status
+  changed_when: gpg_package_status is undefined
+  failed_when: gpg_key_status.rc > 0 and not 'Good signature' in gpg_key_status.stderr
+
+- name: "Unpack the Matomo Archive."
+  unarchive:
+    src: /tmp/matomo.zip
+    dest: /var/www/
+    remote_src: yes
+    owner: "{{ apache2_http_user }}"
+    group: "{{ apache2_http_user }}"
+    creates: /var/www/matomo/
+  notify: installation message
+
+- name: "Cleanup unnecessary Files."
+  file:
+    path: '/var/www/How to install Matomo.html'
+    state: absent

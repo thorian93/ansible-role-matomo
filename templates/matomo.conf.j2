@@ -1,0 +1,80 @@
+# {{ ansible_managed }}
+<VirtualHost *:80>
+ ServerName "{{ matomo_external_url }}"
+ ServerAlias "www.{{ matomo_external_url }}"
+ ServerSignature Off
+ DocumentRoot {{matomo_web_dir}}
+
+ <Directory {{matomo_web_dir}}>
+  Options +FollowSymlinks
+  AllowOverride All
+
+ <IfModule mod_dav.c>
+  Dav off
+ </IfModule>
+
+ SetEnv HOME {{matomo_web_dir}}
+ SetEnv HTTP_HOME {{matomo_web_dir}}
+
+ </Directory>
+
+{% if matomo_redirect_http_to_https %}
+ RewriteEngine on
+ RewriteCond %{HTTPS} !=on
+ RewriteRule .* https://%{SERVER_NAME}%{REQUEST_URI} [NE,R,L]
+{% endif %}
+</VirtualHost>
+
+<VirtualHost *:443>
+ SSLEngine on
+ SSLProtocol all -SSLv2 -SSLv3 -TLSv1 -TLSv1.1
+ SSLHonorCipherOrder on
+ SSLCipherSuite "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256"
+ SSLCompression Off
+ # Not suported yet: SSLSessionTickets Off
+{% if matomo_create_self_signed_cert %}
+ SSLCertificateFile "{{ matomo_self_signed_certificate }}"
+ SSLCertificateKeyFile "{{ matomo_self_signed_certificate_key }}"
+{% elif matomo_custom_cert %}
+ SSLCertificateFile "{{ matomo_custom_cert_file }}"
+ SSLCertificateKeyFile "{{ matomo_custom_cert_key }}"
+{% else %}
+ SSLCertificateFile "{{ matomo_certificate }}"
+ SSLCertificateKeyFile "{{ matomo_certificate_key }}"
+ SSLCACertificateFile "{{ matomo_certificate_chain }}"
+{% endif %}
+
+ # Use HSTS:
+ <IfModule mod_headers.c>
+   Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains; preload"
+ </IfModule>
+
+ ServerName "{{ matomo_external_url }}"
+ ServerAlias "www.{{ matomo_external_url }}"
+ ServerSignature Off
+ DocumentRoot {{matomo_web_dir}}
+
+ # Ensure that encoded slashes are not decoded but left in their encoded state.
+ # http://doc.gitlab.com/ce/api/projects.html#get-single-project
+ AllowEncodedSlashes NoDecode
+
+<Directory {{matomo_web_dir}}>
+  Options +FollowSymlinks
+  AllowOverride All
+
+ <IfModule mod_dav.c>
+  Dav off
+ </IfModule>
+
+ SetEnv HOME {{matomo_web_dir}}
+ SetEnv HTTP_HOME {{matomo_web_dir}}
+
+ </Directory>
+
+ LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b" common_forwarded
+ ErrorLog /var/log/{{ apache2_http_name }}/matomo_error.log
+ CustomLog /var/log/{{ apache2_http_name }}/matomo_forwarded.log common_forwarded
+ CustomLog /var/log/{{ apache2_http_name }}/matomo_access.log combined env=!dontlog
+ CustomLog /var/log/{{ apache2_http_name }}/matomo.log combined
+
+</VirtualHost>

@@ -1,0 +1,32 @@
+---
+- name: Configure HTTPS redirect within Matomo.
+  lineinfile:
+    path: "{{ matomo_web_dir }}/config/config.ini.php"
+    state: present
+    regexp: '^force_ssl =.*'
+    line: 'force_ssl = 1'
+    insertafter: '^\[General\].*'
+  when: matomo_redirect_http_to_https
+
+- name: Configure Matomo to use a Proxy.
+  blockinfile:
+    path: "{{ matomo_web_dir }}/config/config.ini.php"
+    marker: "; {mark} ANSIBLE MANAGED BLOCK"
+    insertbefore: '^\[General\]$'
+    block: |
+      [proxy]
+      type = BASIC ;
+      host = {{ common_proxy_server }} ;
+      port = {{ common_proxy_port}} ;
+  when: matomo_use_proxy
+
+- name: Configure Matomo to log to File.
+  blockinfile:
+    path: "{{ matomo_web_dir }}/config/config.ini.php"
+    marker: "; {mark} ANSIBLE MANAGED BLOCK"
+    insertbefore: '^\[General\]$'
+    block: |
+      [log]
+      log_writers[] = file
+      log_level = WARN
+      logger_file_path = tmp/logs/matomo.log

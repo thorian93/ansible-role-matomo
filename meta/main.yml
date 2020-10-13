@@ -1,0 +1,29 @@
+---
+galaxy_info:
+  author: Thorian93
+  description: Ansible Role Matomo
+  license: "license (MIT)"
+
+  min_ansible_version: 2.5
+
+  galaxy_tags:
+    - linux
+    - server
+    - web
+
+  platforms:
+    - name: Debian
+      versions:
+      - Stretch
+      - Buster
+    - name: Ubuntu
+      versions:
+      - 18
+      - 20
+
+dependencies:
+  - { role: ansible-role-apache2 }
+  - { role: ansible-role-certbot, when: matomo_create_self_signed_cert == "false" and matomo_custom_cert == "false" }
+  - { role: ansible-role-mysql }
+  - { role: ansible-role-php }
+  - { role: ansible-role-webserver }

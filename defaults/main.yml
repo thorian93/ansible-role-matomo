@@ -1,0 +1,49 @@
+---
+matomo_stable_os:
+  - Debian 9
+  - Debian 10
+  - Ubuntu 18
+  - Ubuntu 20
+
+# The URL under which Matomo is available
+matomo_external_url: "{{ inventory_hostname }}"
+
+# Proxy Settings
+matomo_use_proxy: false
+
+# Certificates:
+## Self Signed
+matomo_create_self_signed_cert: true
+matomo_self_signed_cert_subj: "/C=DE/ST=NRW/L=Cologne/O=Org/CN={{matomo_external_url}}"
+matomo_self_signed_certificate_key: "/etc/{{ apache2_http_name }}/ssl/matomo.key"
+matomo_self_signed_certificate: "/etc/{{ apache2_http_name }}/ssl/matomo.crt"
+
+## Custom
+matomo_custom_cert: false
+matomo_custom_cert_file: /etc/{{ apache2_http_name }}/ssl/custom.crt
+matomo_custom_cert_key: /etc/{{ apache2_http_name }}/ssl/custom.key
+
+## LetsEncrypt:
+matomo_certificate_key: "{{ certbot_cert_path }}/privkey.pem"
+matomo_certificate: "{{ certbot_cert_path }}/cert.pem"
+matomo_certificate_chain: "{{ certbot_cert_path }}/fullchain.pem"
+
+# Database:
+matomo_db_system: "mysql"
+matomo_db_name: "matomo"
+matomo_db_user: "matomo"
+matomo_db_pw: "matomo"
+
+# Misc:
+matomo_web_dir: "/var/www/matomo"
+matomo_redirect_http_to_https: true
+matomo_backup: false
+matomo_backup_dir: "/tmp/matomo"
+
+matomo_php_options:
+  - line: "php_value open_basedir {{ matomo_web_dir }}:/usr/share/php:/usr/share/pear"
+    regexp: "^php_value open_basedir"
+
+matomo_mysql_options:
+  - line: "max_allowed_packet = 64M"
+    regexp: "^max_allowed_packet.*"

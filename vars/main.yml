@@ -1,0 +1,14 @@
+---
+apache2_modules:
+  - ssl
+  - rewrite
+
+# Download:
+matomo_download_url: "https://builds.matomo.org"
+# matomo_setup_file: "{{ matomo_download_url }}/matomo.zip"
+# matomo_gpg_key_file: "{{ matomo_download_url }}/matomo.zip.asc"
+matomo_gpg_public_key: "{{ matomo_download_url }}/signature.asc"
+
+# Matomo 4 Beta Installation was successful!
+matomo_setup_file: "{{ matomo_download_url }}/matomo-4.0.0-b3.zip"
+matomo_gpg_key_file: "{{ matomo_download_url }}/matomo-4.0.0-b3.zip.asc"

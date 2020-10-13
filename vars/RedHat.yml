@@ -1,0 +1,12 @@
+---
+matomo_prerequisites:
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-cli"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-curl"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-dom"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-gd"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-geoip"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-json"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-mysqlnd"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-mbstring"
+  - "php{{ php_version_prefix }}{{ php_repo_suffix }}-xml"
+  - unzip

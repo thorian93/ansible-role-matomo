@@ -1,0 +1,116 @@
+---
+- name: "Create Database for Matomo."
+  mysql_db:
+    login_user: "{{ mysql_root_user }}"
+    login_password: "{{ mysql_root_pw }}"
+    login_unix_socket: "{{ mysql_unix_socket }}"
+    name: "{{ matomo_db_name }}"
+    encoding: utf8
+    state: present
+
+- name: "Create Database User for Matomo."
+  mysql_user:
+    login_user: "{{ mysql_root_user }}"
+    login_password: "{{ mysql_root_pw }}"
+    login_unix_socket: "{{ mysql_unix_socket }}"
+    name: "{{ matomo_db_user }}"
+    password: "{{ matomo_db_pw }}"
+    priv: "{{ matomo_db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,INDEX,DROP,ALTER,CREATE TEMPORARY TABLES,LOCK TABLES/*.*:FILE"
+    state: present
+
+- name: "Create self-signed Certificate."
+  command: 'openssl req -new -nodes -x509 -subj "{{ matomo_self_signed_cert_subj }}" -days 365 -keyout {{ matomo_self_signed_certificate_key }} -out {{ matomo_self_signed_certificate }} -extensions v3_ca'
+  args:
+    creates: "{{ matomo_self_signed_certificate }}"
+  when: matomo_create_self_signed_cert
+
+- name: "Enable Apache2 Modules."
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{apache2_modules}}"
+  notify: "restart webserver {{ webserver_name }}"
+  when: ansible_os_family == "Debian"
+
+- name: "Copy Matomo Configuration File for Apache2."
+  template:
+    src: matomo.conf.j2
+    dest: "{{ apache2_http_site_dir }}/matomo.conf"
+    owner: root
+    group: root
+    mode: 0600
+    backup: 'yes'
+    force: 'yes'
+  notify: "reload webserver {{ webserver_name }}"
+
+- name: "Enable Matomo Configuration."
+  command: a2ensite matomo.conf
+  args:
+    creates: "/etc/apache2/sites-enabled/matomo.conf"
+  notify: "reload webserver {{ webserver_name }}"
+  when: ansible_os_family == "Debian"
+
+- name: "Configure Matomo Archive Cronjob."
+  cron:
+    name: "Matomo cronjob"
+    minute: "5"
+    user: root
+    job: "sudo -u {{ apache2_http_user }} php {{ matomo_web_dir }}/console core:archive --force-all-websites --force-all-periods=315576000 --force-date-last-n=1000 --url=http://{{ matomo_external_url }} &>> /tmp/matomo-archive.log"
+    state: present
+
+- name: "Upload Backup logrotate Configuration."
+  template:
+    src: matomo-backup.logrotate.j2
+    dest: /etc/logrotate.d/matomo-backup"
+    mode: 0755
+    owner: root
+    group: root
+  when: matomo_backup
+
+- name: "Upload Backup Script."
+  template:
+    src: matomo-backup.sh.j2
+    dest: "{{ common_scripting_path }}/matomo-backup.sh"
+    owner: root
+    group: root
+    mode: 0700
+    backup: 'yes'
+    force: 'yes'
+  when: matomo_backup
+
+- name: "Configure Backup Script Cron."
+  cron:
+    name: "Matomo Backup"
+    weekday: '2' #Tuesday
+    hour: '1'
+    minute: '0'
+    user: "root"
+    job: "/bin/bash {{ common_scripting_path }}/matomo-backup.sh"
+    state: "{% if matomo_backup %}present{% else %}absent{% endif %}"
+
+# Configure PHP: Adapt for PHP 7!
+- name: "Configure PHP for Matomo."
+  lineinfile:
+    dest: "{{ matomo_web_dir }}/.htaccess"
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+    state: present
+    create: 'yes'
+    owner: root
+    group: "{{ apache2_http_user }}"
+    mode: 0644
+  with_items: "{{ matomo_php_options }}"
+  notify: "reload webserver {{ webserver_name }}"
+
+- name: "Configure MySQL for Matomo."
+  lineinfile:
+    dest: "/etc/mysql/mariadb.conf.d/50-server.cnf"
+    line: "{{ item.line }}"
+    regexp: "{{ item.regexp }}"
+    state: present
+    create: 'yes'
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ matomo_mysql_options }}"
+  notify: restart mysql

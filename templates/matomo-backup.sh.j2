@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+#
+# Written by: Robin Gierse - info@thorian93.de - on 20170511
+#
+# Purpose:
+# This is a backup script for Matomo.
+#
+# Version: 1.0 on 20170511
+# Version: 1.1 on 20180906
+# Version: 1.2 on 20200317
+#
+# Usage:
+# ./matomo-backup.sh
+
+log_dir="{{ matomo_backup_dir }}/log"
+logfile="$log_dir/matomo-backup.log"
+matomo_root="{{ matomo_web_dir }}"
+backup_dir="{{ matomo_backup_dir }}"
+db_name="{{ matomo_db_name }}"
+db_backup_user="{{ mysql_backup_user }}"
+db_backup_pw="{{ mysql_backup_pw }}"
+
+today="$(date +%Y%m%d)"
+
+rsync="$(command -v rsync)"
+PHP="$(command -v php)"
+
+_initialize()
+{
+	echo "Backup started. $(date)"
+	if [ ! -d $backup_dir ]
+	then
+		mkdir -p $backup_dir
+	fi
+
+	if [ ! -d $log_dir ]
+	then
+		mkdir -p $log_dir
+	fi
+	if [ ! -f $logfile ]
+	then
+		touch $logfile
+	fi
+}
+
+_backup_app()
+{
+	echo "$(date +%H:%M:%S) : Backing up $matomo_root..."
+	if [ ! -d "$backup_dir/matomo_app" ]
+	then
+		mkdir -p "$backup_dir/matomo_app"
+	fi
+	$rsync -Aavx --log-file=$logfile $matomo_root "$backup_dir/matomo_app"
+	if [ "$?" == "0" ]
+	then
+		echo "$(date +%H:%M:%S) : Done backing up $matomo_root..."
+	else
+		echo "$(date +%H:%M:%S) : An error occurred during backup."
+	fi
+}
+
+_backup_db()
+{
+	echo "$(date +%H:%M:%S) : Backup Database."
+	mysqldump --single-transaction -h localhost -u$db_backup_user -p$db_backup_pw $db_name > $backup_dir/matomo-sql.bak
+	echo "$(date +%H:%M:%S) : Done backing up Database."
+}
+
+_finish()
+{
+	echo "$(date +%H:%M:%S) : Backup finished."
+}
+
+# Main:
+_initialize 2>&1|tee -a $logfile
+_backup_app 2>&1|tee -a $logfile
+_backup_db 2>&1|tee -a $logfile
+_finish 2>&1|tee -a $logfile

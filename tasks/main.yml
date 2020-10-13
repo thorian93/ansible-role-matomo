@@ -1,0 +1,30 @@
+---
+- name: "Preflight - Fail if target host is not stable for this Role."
+  fail:
+    msg: "This role is not stable for the target operating system, {{ ansible_distribution }} {{ ansible_distribution_major_version }}."
+  when: (ansible_distribution is not defined) or
+        (ansible_distribution_version is not defined) or
+        (ansible_distribution+" "+ansible_distribution_major_version not in matomo_stable_os)
+
+- name: "Include OS Family specific Variables."
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: "Check Matomo Installation."
+  stat:
+    path: "{{ matomo_web_dir }}/config/config.ini.php"
+  register: matomo_status
+
+- name: "Register Installation Status."
+  set_fact:
+   matomo_installed: "{% if matomo_status.stat.exists %}true{% else %}false{% endif %}"
+
+- name: "Run Installation Playbook."
+  include: installation.yml
+  when: not matomo_installed
+
+- name: "Run Configuration Playbook."
+  include: configuration.yml
+
+- name: "Run Post Installation Tasks Playbook."
+  include: after_setup.yml
+  when: matomo_installed
