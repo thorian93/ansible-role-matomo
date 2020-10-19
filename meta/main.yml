@@ -4,7 +4,7 @@ galaxy_info:
   description: Ansible Role Matomo
   license: "license (MIT)"
 
-  min_ansible_version: 2.5
+  min_ansible_version: 2.9
 
   galaxy_tags:
     - linux
@@ -22,8 +22,8 @@ galaxy_info:
       - 20
 
 dependencies:
-  - { role: ansible-role-apache2 }
-  - { role: ansible-role-certbot, when: matomo_create_self_signed_cert == "false" and matomo_custom_cert == "false" }
-  - { role: ansible-role-mysql }
-  - { role: ansible-role-php }
-  - { role: ansible-role-webserver }
+  - { role: thorian93.ansible_role_apache2 }
+  - { role: thorian93.ansible_role_certbot, when: matomo_create_self_signed_cert == "false" and matomo_custom_cert == "false" }
+  - { role: thorian93.ansible_role_mysql }
+  - { role: thorian93.ansible_role_php }
+  - { role: thorian93.ansible_role_webserver }

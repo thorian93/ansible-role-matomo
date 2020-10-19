@@ -1,7 +1,6 @@
 ---
 variables:
   GITHUB_REPO: "git@github.com:thorian93/ansible-role-matomo.git"
-  GITLAB_URL: "https://git.cgn.rg.lan"
 
 stages:
   - cleanup
@@ -23,7 +22,7 @@ secret-scan:
   tags:
     - shell
   script:
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@git.cgn.rg.lan/ansible/ansible-scripts.git scripts
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${GITLAB_HOST}/ansible/ansible-scripts.git scripts
     - ./scripts/secret-finder.sh
 
 ansible-lint:
