@@ -22,8 +22,13 @@ galaxy_info:
       - 20
 
 dependencies:
-  - { role: thorian93.ansible_role_apache2 }
-  - { role: thorian93.ansible_role_certbot, when: matomo_create_self_signed_cert == "false" and matomo_custom_cert == "false" }
-  - { role: thorian93.ansible_role_mysql }
-  - { role: thorian93.ansible_role_php }
-  - { role: thorian93.ansible_role_webserver }
+  - name: thorian93.ansible_role_apache2
+    version: master
+  - name: thorian93.ansible_role_php
+    version: master
+  - name: thorian93.ansible_role_certbot
+    version: master
+  - name: thorian93.ansible_role_mysql
+    version: master
+  - name: thorian93.ansible_role_webserver
+    version: master
