@@ -31,7 +31,7 @@
   unarchive:
     src: /tmp/matomo.zip
     dest: /var/www/
-    remote_src: yes
+    remote_src: 'yes'
     owner: "{{ apache2_http_user }}"
     group: "{{ apache2_http_user }}"
     creates: /var/www/matomo/

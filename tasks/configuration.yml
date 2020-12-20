@@ -81,7 +81,7 @@
 - name: "Configure Backup Script Cron."
   cron:
     name: "Matomo Backup"
-    weekday: '2' #Tuesday
+    weekday: '2'  # Tuesday
     hour: '1'
     minute: '0'
     user: "root"

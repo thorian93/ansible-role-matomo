@@ -21,7 +21,7 @@
 
 - name: "Register Installation Status."
   set_fact:
-   matomo_installed: "{% if matomo_status.stat.exists %}true{% else %}false{% endif %}"
+    matomo_installed: "{% if matomo_status.stat.exists %}true{% else %}false{% endif %}"
 
 - name: "Run Installation Playbook."
   include: installation.yml

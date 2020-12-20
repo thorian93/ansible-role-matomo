@@ -14,12 +14,12 @@ galaxy_info:
   platforms:
     - name: Debian
       versions:
-      - Stretch
-      - Buster
+        - Stretch
+        - Buster
     - name: Ubuntu
       versions:
-      - 18
-      - 20
+        - 18
+        - 20
 
 dependencies:
   - name: thorian93.ansible_role_apache2

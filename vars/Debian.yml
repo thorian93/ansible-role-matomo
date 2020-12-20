@@ -3,7 +3,7 @@ matomo_prerequisites:
   - "php{% if php_major_version != 5 %}{{ php_version_prefix }}{% else %}5{% endif %}-cli"
   - "php{% if php_major_version != 5 %}{{ php_version_prefix }}{% else %}5{% endif %}-curl"
   - "php{% if php_major_version != 5 %}{{ php_version_prefix }}{% else %}5{% endif %}-gd"
-  - "php{% if php_major_version != 5 %}{{ php_version_prefix }}{% else %}5{% endif %}-mbstring"  
+  - "php{% if php_major_version != 5 %}{{ php_version_prefix }}{% else %}5{% endif %}-mbstring"
   - "php{% if php_major_version != 5 %}{{ php_version_prefix }}{% else %}5{% endif %}-mysql"
   - "{% if php_major_version != 5 %}php{{ php_version_prefix }}-xml{% else %}bash{% endif %}"
   - "{% if php_major_version != 5 %}php{{ php_version_prefix }}-mbstring{% else %}bash{% endif %}"
