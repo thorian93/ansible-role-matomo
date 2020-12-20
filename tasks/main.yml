@@ -9,6 +9,11 @@
 - name: "Include OS Family specific Variables."
   include_vars: "{{ ansible_os_family }}.yml"
 
+- name: "Run Certbot Role conditionally."
+  include_role:
+    name: thorian93.ansible_role_certbot
+  when: (not matomo_create_self_signed_cert | bool) or (matomo_custom_cert | bool)
+
 - name: "Check Matomo Installation."
   stat:
     path: "{{ matomo_web_dir }}/config/config.ini.php"

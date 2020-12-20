@@ -26,8 +26,6 @@ dependencies:
     version: master
   - name: thorian93.ansible_role_php
     version: master
-  - name: thorian93.ansible_role_certbot
-    version: master
   - name: thorian93.ansible_role_mysql
     version: master
   - name: thorian93.ansible_role_webserver
