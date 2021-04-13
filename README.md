@@ -4,6 +4,10 @@ This role does a basic setup of Matomo on Debian and Ubuntu servers.
 
 The configuration has to be done initially through the web interface.
 
+[![Ansible Role: Matomo](https://img.shields.io/ansible/role/54224?style=flat-square)](https://galaxy.ansible.com/thorian93/ansible_role_matomo)
+[![Ansible Role: Matomo](https://img.shields.io/ansible/quality/54224?style=flat-square)](https://galaxy.ansible.com/thorian93/ansible_role_matomo)
+[![Ansible Role: Matomo](https://img.shields.io/ansible/role/d/54224?style=flat-square)](https://galaxy.ansible.com/thorian93/ansible_role_matomo)
+
 ## Known issues
 
 None.
@@ -85,7 +89,7 @@ Define MySQL options for Matomo. The defaults given here are necessary for Matom
   - [thorian93.ansible-role-apache2](https://galaxy.ansible.com/thorian93/ansible_role_apache2)
   - [thorian93.ansible-role-php](https://galaxy.ansible.com/thorian93/ansible_role_php)
   - [thorian93.ansible-role-certbot](https://galaxy.ansible.com/thorian93/ansible_role_certbot) - when no custom or self signed certificate is used
-  - [thorian93.ansible-role-mysql](https://galaxy.ansible.com/thorian93/ansible_role_mysql)
+  - [geerlingguy.mysql](https://galaxy.ansible.com/geerlingguy/mysql)
 
 ## OS Compatibility
 
