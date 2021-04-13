@@ -20,8 +20,8 @@ galaxy_info:
         - Buster
     - name: Ubuntu
       versions:
-        - 18
-        - 20
+        - Bionic
+        - Focal
 
 dependencies:
   - src: thorian93.ansible_role_apache2
