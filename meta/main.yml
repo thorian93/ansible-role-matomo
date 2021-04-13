@@ -10,6 +10,8 @@ galaxy_info:
     - linux
     - server
     - web
+    - matomo
+    - analytics
 
   platforms:
     - name: Debian
@@ -22,11 +24,11 @@ galaxy_info:
         - 20
 
 dependencies:
-  - name: thorian93.ansible_role_apache2
+  - src: thorian93.ansible_role_apache2
     version: master
-  - name: thorian93.ansible_role_php
+  - src: thorian93.ansible_role_php
     version: master
-  - name: thorian93.ansible_role_mysql
-    version: master
-  - name: thorian93.ansible_role_webserver
+  - src: geerlingguy.mysql
+    version: 3.2.0
+  - src: thorian93.ansible_role_webserver
     version: master

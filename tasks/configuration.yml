@@ -1,18 +1,16 @@
 ---
 - name: "Create Database for Matomo."
   mysql_db:
-    login_user: "{{ mysql_root_user }}"
-    login_password: "{{ mysql_root_pw }}"
-    login_unix_socket: "{{ mysql_unix_socket }}"
+    login_user: "{{ mysql_user_name }}"
+    login_password: "{{ mysql_user_password }}"
     name: "{{ matomo_db_name }}"
     encoding: utf8
     state: present
 
 - name: "Create Database User for Matomo."
   mysql_user:
-    login_user: "{{ mysql_root_user }}"
-    login_password: "{{ mysql_root_pw }}"
-    login_unix_socket: "{{ mysql_unix_socket }}"
+    login_user: "{{ mysql_user_name }}"
+    login_password: "{{ mysql_user_password }}"
     name: "{{ matomo_db_user }}"
     password: "{{ matomo_db_pw }}"
     priv: "{{ matomo_db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,INDEX,DROP,ALTER,CREATE TEMPORARY TABLES,LOCK TABLES/*.*:FILE"
@@ -88,7 +86,6 @@
     job: "/bin/bash {{ common_scripting_path }}/matomo-backup.sh"
     state: "{% if matomo_backup %}present{% else %}absent{% endif %}"
 
-# Configure PHP: Adapt for PHP 7!
 - name: "Configure PHP for Matomo."
   lineinfile:
     dest: "{{ matomo_web_dir }}/.htaccess"
