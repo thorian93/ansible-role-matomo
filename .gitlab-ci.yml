@@ -1,12 +1,14 @@
 ---
 variables:
-  GITHUB_REPO: "git@github.com:thorian93/ansible-role-matomo.git"
+  REPO_NAME: "ansible-role-matomo"
+  GITHUB_REPO: "git@github.com:thorian93/${REPO_NAME}.git"
+  GITLAB_REPO: "git@gitlab.com:thorian93_ansible/${REPO_NAME}.git"
 
 stages:
   - cleanup
   - security
   - linting
-  # - deploy
+  - deploy
   - finish
 
 clean-build-area:
@@ -46,13 +48,49 @@ shell-lint:
   script:
     - find ./ -name "*.sh" -exec shellcheck {} \;
 
-# deploy-github:
-#   stage: deploy
-#   tags:
-#     - shell
-#   script:
-#     - git remote set-url --push origin $GITHUB_REPO
-#     - git push origin HEAD:$CI_COMMIT_REF_NAME
+github-deploy-master:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - git remote set-url --push origin ${GITHUB_REPO}
+    - git push origin HEAD:${CI_COMMIT_REF_NAME}
+  only:
+    - master
+
+github-deploy-tags:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - git remote set-url --push origin ${GITHUB_REPO}
+    - git push origin ${CI_COMMIT_TAG}
+  only:
+    - tags
+  except:
+    - branches
+
+gitlab-deploy-master:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - git remote add gitlab ${GITLAB_REPO}
+    - git push gitlab HEAD:${CI_COMMIT_REF_NAME}
+  only:
+    - master
+
+gitlab-deploy-tags:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - git remote add gitlab ${GITLAB_REPO}
+    - git push gitlab ${CI_COMMIT_TAG}
+  only:
+    - tags
+  except:
+    - branches
 
 open-issue:
   stage: finish

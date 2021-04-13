@@ -1,6 +1,6 @@
 # Ansible Role: Matomo
 
-This role does a basic setup of Matomo on Debian and Ubuntu servers. 
+This role does a basic setup of Matomo on Debian and Ubuntu servers.
 
 The configuration has to be done initially through the web interface.
 
