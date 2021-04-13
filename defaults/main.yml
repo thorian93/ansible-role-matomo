@@ -14,7 +14,7 @@ matomo_use_proxy: 'false'
 # Certificates:
 ## Self Signed
 matomo_create_self_signed_cert: 'true'
-matomo_self_signed_cert_subj: "/C=DE/ST=NRW/L=Cologne/O=Org/CN={{matomo_external_url}}"
+matomo_self_signed_cert_subj: "/C=DE/ST=NRW/L=Cologne/O=Org/CN={{ matomo_external_url }}"
 matomo_self_signed_certificate_key: "/etc/{{ apache2_http_name }}/ssl/matomo.key"
 matomo_self_signed_certificate: "/etc/{{ apache2_http_name }}/ssl/matomo.crt"
 
