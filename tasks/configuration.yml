@@ -53,7 +53,7 @@
     name: "Matomo cronjob"
     minute: "5"
     user: root
-    job: "sudo -u {{ apache2_http_user }} php {{ matomo_web_dir }}/console core:archive --force-all-websites --force-all-periods=315576000 --force-date-last-n=1000 --url=http://{{ matomo_external_url }} &>> /tmp/matomo-archive.log"
+    job: "sudo -u {{ apache2_http_user }} php {{ matomo_web_dir }}/console core:archive --force-all-websites --force-date-last-n=1000 --url=http://{{ matomo_external_url }} &>> /tmp/matomo-archive.log"
     state: present
 
 - name: "Upload Backup logrotate Configuration."
