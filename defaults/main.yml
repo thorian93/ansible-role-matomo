@@ -8,6 +8,9 @@ matomo_stable_os:
 # The URL under which Matomo is available
 matomo_external_url: "{{ inventory_hostname }}"
 
+# Set this to use an explicit version (e.g. 4.2.1). Default installs the latest version
+matomo_version: ''
+
 # Proxy Settings
 matomo_use_proxy: 'false'
 

@@ -5,10 +5,6 @@ apache2_modules:
 
 # Download:
 matomo_download_url: "https://builds.matomo.org"
-# matomo_setup_file: "{{ matomo_download_url }}/matomo.zip"
-# matomo_gpg_key_file: "{{ matomo_download_url }}/matomo.zip.asc"
+matomo_setup_file: "{{ matomo_download_url }}/matomo{% if matomo_version is defined and matomo_version | length %}-{{ matomo_version }}{% endif %}.zip"
+matomo_gpg_key_file: "{{ matomo_download_url }}/matomo{% if matomo_version is defined and matomo_version | length %}-{{ matomo_version }}{% endif %}.zip.asc"
 matomo_gpg_public_key: "{{ matomo_download_url }}/signature.asc"
-
-# Matomo 4 Beta Installation was successful!
-matomo_setup_file: "{{ matomo_download_url }}/matomo-4.0.0-b3.zip"
-matomo_gpg_key_file: "{{ matomo_download_url }}/matomo-4.0.0-b3.zip.asc"

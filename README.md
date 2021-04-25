@@ -25,6 +25,10 @@ No special requirements; note that this role requires root access, so either run
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
+    matomo_version: ''
+
+Set this to use an explicit version (e.g. `4.2.1`). Default installs the latest version.
+
     matomo_external_url: "{{ inventory_hostname }}"
 
 The external URL under which Matomo will become available.
