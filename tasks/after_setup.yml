@@ -6,7 +6,7 @@
     regexp: '^force_ssl =.*'
     line: 'force_ssl = 1'
     insertafter: '^\[General\].*'
-  when: matomo_redirect_http_to_https
+  when: matomo_redirect_http_to_https | bool
 
 - name: Configure Matomo to use a Proxy.
   blockinfile:
@@ -18,7 +18,7 @@
       type = BASIC ;
       host = {{ common_proxy_server }} ;
       port = {{ common_proxy_port}} ;
-  when: matomo_use_proxy
+  when: matomo_use_proxy | bool
 
 - name: Configure Matomo to log to File.
   blockinfile:

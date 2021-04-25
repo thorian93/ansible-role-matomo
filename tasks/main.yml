@@ -25,11 +25,11 @@
 
 - name: "Run Installation Playbook."
   include: installation.yml
-  when: not matomo_installed
+  when: not matomo_installed | bool
 
 - name: "Run Configuration Playbook."
   include: configuration.yml
 
 - name: "Run Post Installation Tasks Playbook."
   include: after_setup.yml
-  when: matomo_installed
+  when: matomo_installed | bool

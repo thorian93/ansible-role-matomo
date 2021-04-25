@@ -20,7 +20,7 @@
   command: 'openssl req -new -nodes -x509 -subj "{{ matomo_self_signed_cert_subj }}" -days 365 -keyout {{ matomo_self_signed_certificate_key }} -out {{ matomo_self_signed_certificate }} -extensions v3_ca'
   args:
     creates: "{{ matomo_self_signed_certificate }}"
-  when: matomo_create_self_signed_cert
+  when: matomo_create_self_signed_cert | bool
 
 - name: "Enable Apache2 Modules."
   apache2_module:
@@ -63,7 +63,7 @@
     mode: 0755
     owner: root
     group: root
-  when: matomo_backup
+  when: matomo_backup | bool
 
 - name: "Upload Backup Script."
   template:
@@ -74,7 +74,7 @@
     mode: 0700
     backup: 'yes'
     force: 'yes'
-  when: matomo_backup
+  when: matomo_backup | bool
 
 - name: "Configure Backup Script Cron."
   cron:
