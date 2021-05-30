@@ -11,7 +11,7 @@
 
 - name: "Run Certbot Role conditionally."
   include_role:
-    name: thorian93.ansible_role_certbot
+    name: thorian93.certbot
   when: (not matomo_create_self_signed_cert | bool) or (matomo_custom_cert | bool)
 
 - name: "Check Matomo Installation."
