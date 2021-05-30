@@ -1,7 +1,8 @@
 ---
 galaxy_info:
-  author: Thorian93
-  description: Ansible Role Matomo
+  role_name: matomo
+  author: thorian93
+  description: Matomo - Open Source Web Analytics
   license: "license (MIT)"
 
   min_ansible_version: 2.9
@@ -24,11 +25,11 @@ galaxy_info:
         - Focal
 
 dependencies:
-  - name: thorian93.ansible_role_apache2
+  - name: thorian93.apache2
     version: master
-  - name: thorian93.ansible_role_php
+  - name: thorian93.php
     version: master
   - name: geerlingguy.mysql
     version: 3.2.0
-  - name: thorian93.ansible_role_webserver
+  - name: thorian93.webserver
     version: master
