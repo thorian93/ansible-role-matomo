@@ -18,7 +18,7 @@ No special requirements; note that this role requires root access, so either run
 
     - hosts: foobar
       roles:
-        - role: ansible-role-matomo
+        - role: thorian93.matomo
           become: yes
 
 ## Role Variables
