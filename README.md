@@ -1,5 +1,7 @@
 # Ansible Role: Matomo
 
+<img src="https://img.shields.io/badge/-Matomo-%233152A0?style=for-the-badge&logo=Matomo" alt="Matomo">
+
 This role does a basic setup of Matomo on Debian and Ubuntu servers.
 
 The configuration has to be done initially through the web interface.
@@ -38,23 +40,23 @@ The external URL under which Matomo will become available.
 Define, whether Matomo needs a proxy to access the internet.
 
     matomo_create_self_signed_cert: true
-    matomo_self_signed_cert_subj: "/C=DE/ST=NRW/L=Cologne/O=Org/CN={{matomo_external_url}}"
+    matomo_self_signed_cert_subj: "/C=DE/ST=FOO/L=BAR/O=Org/CN={{ matomo_external_url }}"
     matomo_self_signed_certificate_key: "/etc/{{ apache2_http_name }}/ssl/matomo.key"
     matomo_self_signed_certificate: "/etc/{{ apache2_http_name }}/ssl/matomo.crt"
 
-Configure self signed certificates.
+Configure self signed certificates to your liking.
 
     matomo_custom_cert: false
     matomo_custom_cert_file: /etc/{{ apache2_http_name }}/ssl/custom.crt
     matomo_custom_cert_key: /etc/{{ apache2_http_name }}/ssl/custom.key
 
-Configure custom certificates.
+If you want to use your own certificate you can define that here.
 
     matomo_certificate_key: "{{ certbot_cert_path }}/privkey.pem"
     matomo_certificate: "{{ certbot_cert_path }}/cert.pem"
     matomo_certificate_chain: "{{ certbot_cert_path }}/fullchain.pem"
 
-Configure certbot certificates.
+If `matomo_create_self_signed_cert` and `matomo_custom_cert` are set to false, [thorian93.certbot](https://galaxy.ansible.com/thorian93/certbot) will be used to acquire certificates.
 
     matomo_db_system: "mysql"
     matomo_db_name: "matomo"
