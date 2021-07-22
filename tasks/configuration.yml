@@ -48,12 +48,24 @@
   notify: "reload webserver {{ webserver_name }}"
   when: ansible_os_family == "Debian"
 
+- name: "Ensure Matomo Helper Directories exist."
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+  loop:
+    - "{{ matomo_scripts_dir }}"
+    - "{{ matomo_log_dir }}"
+    - "{{ matomo_backup_dir }}"
+
 - name: "Configure Matomo Archive Cronjob."
   cron:
-    name: "Matomo cronjob"
+    name: "Matomo Archive"
     minute: "5"
     user: root
-    job: "sudo -u {{ apache2_http_user }} php {{ matomo_web_dir }}/console core:archive --force-all-websites --force-date-last-n=1000 --url=http://{{ matomo_external_url }} &>> /tmp/matomo-archive.log"
+    job: "sudo -u {{ apache2_http_user }} php {{ matomo_web_dir }}/console core:archive --force-all-websites --force-date-last-n=1000 --url=http://{{ matomo_external_url }} >> {{ matomo_log_dir }}/core_archive.log"
     state: present
 
 - name: "Upload Backup logrotate Configuration."
@@ -68,7 +80,7 @@
 - name: "Upload Backup Script."
   template:
     src: matomo-backup.sh.j2
-    dest: "{{ common_scripting_path }}/matomo-backup.sh"
+    dest: "{{ matomo_scripts_dir }}/matomo-backup.sh"
     owner: root
     group: root
     mode: 0700
@@ -83,8 +95,8 @@
     hour: '1'
     minute: '0'
     user: "root"
-    job: "/bin/bash {{ common_scripting_path }}/matomo-backup.sh"
-    state: "{% if matomo_backup %}present{% else %}absent{% endif %}"
+    job: "/bin/bash {{ matomo_scripts_dir }}/matomo-backup.sh >> {{ matomo_log_dir }}/backup.log"
+    state: "{% if matomo_backup | bool %}present{% else %}absent{% endif %}"
 
 - name: "Configure PHP for Matomo."
   lineinfile:
