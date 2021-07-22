@@ -12,27 +12,73 @@
 # Usage:
 # ./matomo-backup.sh
 
-log_dir="{{ matomo_backup_dir }}/log"
-logfile="$log_dir/matomo-backup.log"
-matomo_root="{{ matomo_web_dir }}"
-backup_dir="{{ matomo_backup_dir }}"
-db_name="{{ matomo_db_name }}"
-db_backup_user="{{ mysql_backup_user }}"
-db_backup_pw="{{ mysql_backup_pw }}"
+set -e
 
-today="$(date +%Y%m%d)"
+# Variables:
+matomo_path="{{ matomo_web_dir | default('/var/www/matomo') }}"
+backup_target="{{ matomo_backup_dir | default('/tmp/matomo/backup') }}"
+log_dir="{{ matomo_log_dir | default('/tmp/matomo/logs') }}"
+logfile="$log_dir/backup.log"
+exe_rsync="$(command -v rsync)"
+opts_rsync="-Aavx"
+exe_tar="$(command -v tar)"
+opts_tar="-caf"
+exe_mysqldump="$(command -v mysqldump)"
+opts_mysqldump='--single-transaction'
+database_name='{{ matomo_db_name }}'
+database_host='localhost'
+database_user='{{ mysql_backup_user }}'
+database_pass='{{ mysql_backup_pw }}'
 
-rsync="$(command -v rsync)"
-PHP="$(command -v php)"
+while getopts ":s:t:d:u:p:h" opt; do
+  case $opt in
+    s)
+      matomo_path="${OPTARG%/}"
+      ;;
+    t)
+      backup_target="${OPTARG%/}"
+      ;;
+    d)
+      database_name="$OPTARG"
+      ;;
+    u)
+      database_user="$OPTARG"
+      ;;
+    p)
+      database_pass="$OPTARG"
+      ;;
+    h)
+      print_help="true"
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Functions:
 
 _initialize()
 {
 	echo "Backup started. $(date)"
-	if [ ! -d $backup_dir ]
-	then
-		mkdir -p $backup_dir
-	fi
-
+    if [ ! -d "${backup_target}" ]
+    then
+        echo "Creating backup target: ${backup_target}"
+        mkdir -p "${backup_target}"
+    fi
+    if [ ! -d "${matomo_path}" ]
+    then
+        echo 'No Matomo Installation found!' ; exit 1
+    fi
+    if [ -z "${database_name}" ]
+    then
+        echo 'No Matomo Database specified!' ; exit 1
+    fi
 	if [ ! -d $log_dir ]
 	then
 		mkdir -p $log_dir
@@ -41,38 +87,55 @@ _initialize()
 	then
 		touch $logfile
 	fi
+	if [ ! -d "$backup_target/files" ]
+	then
+		mkdir -p "$backup_target/files"
+	fi
+	echo "$(date) - Ready to take off"
 }
 
-_backup_app()
+_backup_database()
 {
-	echo "$(date +%H:%M:%S) : Backing up $matomo_root..."
-	if [ ! -d "$backup_dir/matomo_app" ]
-	then
-		mkdir -p "$backup_dir/matomo_app"
-	fi
-	$rsync -Aavx --log-file=$logfile $matomo_root "$backup_dir/matomo_app"
+	echo "$(date) - Dump Database."
+	${exe_mysqldump} ${opts_mysqldump} "${database_name}" -h"${database_host}" -u"${database_user}" -p"${database_pass}" > $backup_target/matomo-sql.bak
+	echo "$(date) - Done backing up Database."
+}
+
+_backup_files()
+{
+	echo "$(date) - Backing up $matomo_path..."
+	${exe_rsync} ${opts_rsync} --log-file=$logfile $matomo_path "$backup_target/files"
 	if [ "$?" == "0" ]
 	then
-		echo "$(date +%H:%M:%S) : Done backing up $matomo_root..."
+		echo "$(date) - Done backing up $matomo_path..."
 	else
-		echo "$(date +%H:%M:%S) : An error occurred during backup."
+		echo "$(date) - An error occurred during backup."
 	fi
 }
 
-_backup_db()
-{
-	echo "$(date +%H:%M:%S) : Backup Database."
-	mysqldump --single-transaction -h localhost -u$db_backup_user -p$db_backup_pw $db_name > $backup_dir/matomo-sql.bak
-	echo "$(date +%H:%M:%S) : Done backing up Database."
+_finish () {
+    echo "$(date) - Compress Backup"
+    ${exe_tar} ${opts_tar} "${backup_target}.tar.gz" "${backup_target}" 2>&1
+    echo "$(date) - All Done"
 }
 
-_finish()
-{
-	echo "$(date +%H:%M:%S) : Backup finished."
+_help() {
+    echo '#######################################################################################'
+    echo '# -s    The source of the files. Referes to your webapp installation.                 #'
+    echo '# -t    The target for the backup. Backup files will be created under this directory. #'
+    echo '# -d    Database to backup.                                                           #'
+    echo '# -u    Database user.                                                                #'
+    echo '# -p    Database password.                                                            #'
+    echo '# -h    Print this help message.                                                      #'
+    echo '#######################################################################################'
 }
 
 # Main:
-_initialize 2>&1|tee -a $logfile
-_backup_app 2>&1|tee -a $logfile
-_backup_db 2>&1|tee -a $logfile
-_finish 2>&1|tee -a $logfile
+if [ "${print_help}" == "true" ]
+then
+  _help && exit 0
+fi
+_initialize
+_backup_database
+_backup_files
+_finish

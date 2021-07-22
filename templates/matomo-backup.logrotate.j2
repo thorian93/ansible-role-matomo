@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 
-{{ matomo_backup_dir }}/log/matomo-backup.log {
+{{ matomo_log_dir | default('/tmp/matomo/logs') }}/backup.log {
     daily
     missingok
     notifempty
