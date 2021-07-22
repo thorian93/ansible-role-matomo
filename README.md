@@ -65,10 +65,6 @@ If `matomo_create_self_signed_cert` and `matomo_custom_cert` are set to false, [
 
 Configure database settings. Currently available is only MySQL/MariaDB. **Make sure to change the default user and password.**
 
-    matomo_web_dir: "/var/www/matomo"
-
-Define the webroot of Matomo.
-
     matomo_redirect_http_to_https: true
 
 Configure whether Matomo should redirect all incoming requests to HTTPS per default.
@@ -77,6 +73,18 @@ Configure whether Matomo should redirect all incoming requests to HTTPS per defa
     matomo_backup_dir: "/tmp/matomo"
 
 Configure Backups fort Matomo.
+
+    matomo_log_dir: "/tmp/matomo/logs"
+
+The directory used for custom logging, e.g. for backups.
+
+    matomo_web_dir: "/var/www/matomo"
+
+Define the webroot of Matomo.
+
+    matomo_scripts_dir: "{{ matomo_web_dir }}/scripts"
+
+The directory to put custom scripts, e.g. for backups.
 
     matomo_php_options:
       - line: "php_value open_basedir {{ matomo_web_dir }}:/usr/share/php:/usr/share/pear"
